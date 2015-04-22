@@ -35,6 +35,7 @@ const (
 	GravityCenter    = "c"
 
 	FilterGrayScale = "grayscale"
+	FilterGradient	= "gradient"
 
 	DefaultScale        = 1
 	DefaultCroppingMode = CroppingModeExact
@@ -142,7 +143,7 @@ func isValidGravity(str string) bool {
 }
 
 func isValidFilter(str string) bool {
-	return str == FilterGrayScale
+	return str == FilterGrayScale || str == FilterGradient
 }
 
 func isEasternGravity(str string) bool {
