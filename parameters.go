@@ -37,6 +37,9 @@ const (
 	FilterGrayScale = "grayscale"
 	FilterGradient	= "gradient"
 
+	parameterGradientHeigth		= "gh"
+	parameterGradientIntensity	= "gi"
+
 	DefaultScale        = 1
 	DefaultCroppingMode = CroppingModeExact
 	DefaultGravity      = GravityNorthWest
@@ -51,17 +54,18 @@ var (
 type Params struct {
 	width, height, scale      int
 	cropping, gravity, filter string
+	gh, gi			  int
 }
 
 // ToString turns parameters into a unique string for each possible assignment of parameters
 func (p Params) ToString() string {
 	// 0 as a value for width or height means that it will be calculated
-	return fmt.Sprintf("%s_%s,%s_%s,%s_%d,%s_%d,%s_%s,%s_%d", parameterCropping, p.cropping, parameterGravity, p.gravity, parameterHeight, p.height, parameterWidth, p.width, parameterFilter, p.filter, parameterScale, p.scale)
+	return fmt.Sprintf("%s_%s,%s_%s,%s_%d,%s_%d,%s_%s,%s_%d,%s_%d,%s_%d", parameterCropping, p.cropping, parameterGravity, p.gravity, parameterHeight, p.height, parameterWidth, p.width, parameterFilter, p.filter, parameterScale, p.scale, parameterGradientHeigth, p.gh, parameterGradientIntensity, p.gi)
 }
 
 // WithScale returns a copy of a Params struct with the scale set to the given value
 func (p Params) WithScale(scale int) Params {
-	return Params{p.width, p.height, scale, p.cropping, p.gravity, p.filter}
+	return Params{p.width, p.height, scale, p.cropping, p.gravity, p.filter, p.gh, p.gi}
 }
 
 // Turns a string like "w_400,h_300" and an image path into a Params struct
@@ -69,7 +73,7 @@ func (p Params) WithScale(scale int) Params {
 // Also validates the parameters to make sure they have valid values
 // w = width, h = height
 func parseParameters(parametersStr string) (Params, error) {
-	params := Params{0, 0, DefaultScale, DefaultCroppingMode, DefaultGravity, DefaultFilter}
+	params := Params{0, 0, DefaultScale, DefaultCroppingMode, DefaultGravity, DefaultFilter, 0, 0}
 	parts := strings.Split(parametersStr, ",")
 	for _, part := range parts {
 		keyAndValue := strings.SplitN(part, "_", 2)
@@ -114,6 +118,19 @@ func parseParameters(parametersStr string) (Params, error) {
 				return params, fmt.Errorf("invalid value for %q", key)
 			}
 			params.filter = value
+                case parameterGradientHeigth, parameterGradientIntensity:
+                        value, err := strconv.Atoi(value)
+                        if err != nil {
+                                return params, fmt.Errorf("could not parse value for parameter: %q", key)
+                        }
+                        if value <= 0 {
+                                return params, fmt.Errorf("value %d must be > 0: %q", value, key)
+                        }
+                        if key == parameterGradientHeigth {
+                                params.gh = value
+                        } else {
+                                params.gi = value
+                        }
 		}
 	}
 

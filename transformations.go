@@ -221,16 +221,18 @@ func transformCropAndResize(img image.Image, transformation *Transformation) (im
 
         if parameters.filter == FilterGradient {
                 var z uint8
+		gh := parameters.gh
+		gi := parameters.gi
                 bounds := imgNew.Bounds()
                 finalImage := image.NewRGBA(bounds)
                 mask := image.NewRGBA(bounds)
                 w, h := bounds.Max.X, bounds.Max.Y
-                gh := int(float64(h) * 0.6)
+		gh = h - gh
                 white := color.RGBA{255,255,255,0}
                 for x := 0 ; x < w; x++ {
                         for y := 0; y < h; y++ {
                                 if y > gh {
-                                        z = uint8( 200.0 * float64(y-gh)/float64(w-gh) )
+                                        z = uint8( float64(gi) * float64(y-gh)/float64(w-gh) )
                                         mask.Set(x, y, color.RGBA{0,0,0,z})
                                 } else {
                                         mask.Set(x, y, white)
