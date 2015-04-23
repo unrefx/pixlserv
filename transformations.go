@@ -227,12 +227,11 @@ func transformCropAndResize(img image.Image, transformation *Transformation) (im
                 finalImage := image.NewRGBA(bounds)
                 mask := image.NewRGBA(bounds)
                 w, h := bounds.Max.X, bounds.Max.Y
-		gh = h - gh
                 white := color.RGBA{255,255,255,0}
                 for x := 0 ; x < w; x++ {
                         for y := 0; y < h; y++ {
                                 if y > gh {
-                                        z = uint8( float64(gi) * float64(y-gh)/float64(w-gh) )
+                                        z = uint8( float64(gi) * float64(y-gh)/float64(h-gh) )
                                         mask.Set(x, y, color.RGBA{0,0,0,z})
                                 } else {
                                         mask.Set(x, y, white)
